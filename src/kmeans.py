@@ -9,8 +9,15 @@ from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.sql import SparkSession
 from src.preprocess import Preprocess
 
+from logger import Logger
+
+SHOW_LOG = True
 
 class KMeansModel:
+    def __init__(self):
+        logger = Logger(SHOW_LOG)
+        self.log = logger.get_logger(__name__)
+        self.log.info('KmeansEvaluator initialized.')
     def clustering(self, final_data):
         silhouette_score = []
 
@@ -26,6 +33,7 @@ class KMeansModel:
             score = evaluator.evaluate(predictions)
             silhouette_score.append(score)
             print('Silhouette Score for k =', i, 'is', score)
+        self.log.info('Kmeans trained successfully.')
 
 
 def main():
@@ -50,7 +58,7 @@ def main():
     final_data = preprocessor.scale_data(assembled_data)
     kmeans = KMeansModel()
     kmeans.clustering(final_data)
-
+    assembled_data.collect()
     spark.stop()
 
 
